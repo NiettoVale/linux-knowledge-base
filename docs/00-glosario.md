@@ -147,6 +147,54 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | `chattr +S`                  | Fuerza escritura síncrona a disco de cada cambio, priorizando integridad sobre rendimiento.                                                     |
 | `e`, `E`, `I` (solo lectura) | Atributos gestionados automáticamente por el kernel/filesystem (extents, cifrado, indexado htree); visibles con `lsattr` pero no configurables. |
 
+## Linux Capabilities
+
+| Comando / concepto          | Descripción                                                                                                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Capability                  | Privilegio específico del kernel, extraído del conjunto monolítico de `root`, que puede asignarse de forma independiente a un proceso o binario (principio de mínimo privilegio). |
+| `getcap`                    | Consulta las capabilities asignadas a un binario (`getcap archivo`) o, recursivamente, a todo un árbol de directorios (`getcap -r /`).                                            |
+| `setcap`                    | Asigna o retira capabilities sobre un binario (`setcap cap_net_raw+ep archivo`; `setcap -r archivo` para quitarlas todas).                                                        |
+| `capsh`                     | Inspecciona (`--print`) o decodifica (`--decode=valor`) las capabilities del shell/proceso actual.                                                                                |
+| Permitted (P)               | Techo de capabilities que un proceso puede llegar a activar en su conjunto Effective.                                                                                             |
+| Effective (E)               | Capabilities que el kernel evalúa activamente para autorizar o denegar una operación en este momento.                                                                             |
+| Inheritable (I)             | Capabilities que un proceso puede transmitir a los programas que ejecute vía `exec()`.                                                                                            |
+| Bounding                    | Techo global: ninguna capability puede añadirse a P/E/I si no está en este conjunto.                                                                                              |
+| Ambient                     | Permite que ciertas capabilities sobrevivan a un `exec()` hacia un binario sin `setcap` propio (usado por `systemd`).                                                             |
+| `cap_setuid` / `cap_setgid` | Permiten invocar `setuid()`/`setgid()` y cambiar el UID/GID efectivo del proceso a voluntad (incluido `root`).                                                                    |
+| `cap_dac_override`          | Permite saltarse los permisos de lectura/escritura/ejecución de cualquier archivo del sistema.                                                                                    |
+| `cap_dac_read_search`       | Permite saltarse los permisos de lectura y de búsqueda en directorios sobre cualquier archivo.                                                                                    |
+| `cap_chown` / `cap_fowner`  | Permiten cambiar el propietario o los permisos de cualquier archivo del sistema.                                                                                                  |
+| `cap_sys_ptrace`            | Permite usar `ptrace()` sobre cualquier proceso, incluyendo inspeccionar/modificar procesos de `root`.                                                                            |
+| `cap_sys_admin`             | Capability muy amplia y poco granular ("la nueva root"); incluye montar sistemas de archivos arbitrarios, entre muchas otras operaciones administrativas.                         |
+| `cap_sys_module`            | Permite cargar/descargar módulos del kernel (`insmod`/`rmmod`); equivale a ejecución de código en anillo 0.                                                                       |
+| `cap_net_bind_service`      | Permite vincularse a puertos por debajo del 1024 sin ser `root`; uso legítimo habitual en servidores web.                                                                         |
+| `cap_setfcap`               | Permite asignar capabilities a otros archivos mediante `setcap`, pudiendo autoconcederse privilegios adicionales.                                                                 |
+| GTFOBins                    | Catálogo curado de binarios Unix legítimos abusables bajo SUID, `sudo` o capabilities (gtfobins.github.io).                                                                       |
+
+## Sistema de directorios (FHS)
+
+| Directorio    | Descripción                                                                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`           | Directorio raíz; punto de partida de todo el árbol de archivos del sistema.                                                           |
+| `/bin`        | Binarios esenciales disponibles para todos los usuarios (`ls`, `cat`, `bash`); en sistemas modernos suele ser un enlace a `/usr/bin`. |
+| `/boot`       | Archivos necesarios para el arranque: kernel, initramfs y gestor de arranque (GRUB).                                                  |
+| `/dev`        | Representación de los dispositivos de hardware como archivos (`/dev/sda`, `/dev/null`, `/dev/tcp/...`).                               |
+| `/etc`        | Archivos de configuración del sistema y de los programas instalados (`passwd`, `sudoers`, `ssh`, `crontab`).                          |
+| `/home`       | Directorios personales de los usuarios (excepto `root`).                                                                              |
+| `/lib`        | Bibliotecas compartidas (`.so`) necesarias para los binarios de `/bin` y `/sbin`.                                                     |
+| `/mnt`        | Punto de montaje manual y temporal para dispositivos de almacenamiento.                                                               |
+| `/media`      | Punto de montaje automático para medios extraíbles (USB, CD-ROM).                                                                     |
+| `/opt`        | Software opcional de terceros, fuera del gestor de paquetes de la distribución.                                                       |
+| `/proc`       | Sistema de archivos virtual con información en tiempo real de procesos y del kernel (`/proc/<pid>/status`, `/proc/cpuinfo`).          |
+| `/root`       | Directorio personal del usuario `root`.                                                                                               |
+| `/sbin`       | Binarios de administración, pensados para ejecutarse con privilegios de `root`.                                                       |
+| `/srv`        | Datos servidos por servicios de servidor instalados en la máquina.                                                                    |
+| `/tmp`        | Archivos temporales, con escritura abierta a todos los usuarios y protegido por sticky bit.                                           |
+| `/usr`        | Grueso del software instalado en el sistema; contenido de solo lectura y compartible.                                                 |
+| `/var`        | Datos variables: logs (`/var/log`), colas de trabajos, cachés de paquetes.                                                            |
+| `/sys`        | Sistema de archivos virtual con la vista jerárquica del kernel, dispositivos y drivers.                                               |
+| `/lost+found` | Directorio generado por `fsck` en filesystems ext, donde se depositan fragmentos recuperados tras una corrupción.                     |
+
 ## Procesos: foreground y background
 
 | Comando / concepto | Descripción                                                                                                                        |
