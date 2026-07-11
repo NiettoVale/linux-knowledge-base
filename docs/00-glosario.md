@@ -101,6 +101,52 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | `\|`                     | Pipe: redirige stdout de un comando como stdin del siguiente.                             |
 | `\|&`                    | Redirige stdout y stderr de un comando como stdin del siguiente (bash 4.0+).              |
 
+## Gestión de archivos y permisos
+
+| Comando / concepto | Descripción                                                                                                      |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| `touch`            | Crea un archivo vacío, o actualiza su fecha de modificación si ya existe.                                        |
+| `rm`               | Elimina un archivo.                                                                                              |
+| `rm -r`            | Elimina un directorio y todo su contenido de forma recursiva.                                                    |
+| `chmod`            | Modifica los permisos (lectura, escritura, ejecución) de un archivo o directorio, en notación simbólica u octal. |
+| `chown`            | Cambia el propietario y/o el grupo propietario de un archivo o directorio (`chown usuario:grupo archivo`).       |
+| `chgrp`            | Cambia únicamente el grupo propietario de un archivo o directorio.                                               |
+
+## Usuarios y grupos (administración)
+
+| Comando / concepto | Descripción                                                                                                              |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `useradd`          | Crea un nuevo usuario en el sistema. Con `-d` se define su directorio home y con `-s` su shell por defecto.              |
+| `passwd`           | Asigna o cambia la contraseña de un usuario.                                                                             |
+| `groupadd`         | Crea un nuevo grupo en el sistema.                                                                                       |
+| `usermod`          | Modifica atributos de un usuario existente; con `-a -G grupo` lo agrega a un grupo secundario sin quitarlo de los demás. |
+| User private group | Grupo creado automáticamente con el mismo nombre que el usuario al ejecutar `useradd`.                                   |
+
+## Notación y permisos especiales
+
+| Comando / concepto               | Descripción                                                                                                                                                                                                    |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Notación simbólica               | Representa los permisos con letras (`rwx`), agrupadas en tres bloques: propietario, grupo y otros.                                                                                                             |
+| Notación octal                   | Representa los permisos con números del 0 al 7 por bloque, sumando `4` (lectura), `2` (escritura) y `1` (ejecución).                                                                                           |
+| `chmod u+x`, `g-w`, `o+r`        | Sintaxis simbólica de `chmod`: `u`/`g`/`o` (categoría), `+`/`-` (agregar/quitar), `r`/`w`/`x` (permiso).                                                                                                       |
+| SUID (`chmod u+s` / `4xxx`)      | El archivo se ejecuta con los privilegios de su propietario, sin importar quién lo invoque. Se muestra como `s`/`S` en el bloque del propietario.                                                              |
+| SGID (`chmod g+s` / `2xxx`)      | El archivo se ejecuta con los privilegios de su grupo propietario; en directorios, los archivos creados heredan el grupo del directorio. Se muestra como `s`/`S` en el bloque del grupo.                       |
+| Sticky bit (`chmod +t` / `1xxx`) | En un directorio, solo el propietario de cada archivo y `root` pueden borrarlo o renombrarlo, aunque otros tengan permiso de escritura. Se muestra como `t`/`T` en el bloque de otros. Ejemplo típico: `/tmp`. |
+
+## Atributos de bajo nivel: chattr y lsattr
+
+| Comando / concepto           | Descripción                                                                                                                                     |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lsattr`                     | Lista los atributos de bajo nivel asignados a un archivo o directorio (a nivel de inodo).                                                       |
+| `chattr`                     | Modifica los atributos de bajo nivel de un archivo o directorio.                                                                                |
+| `chattr +i`                  | Atributo inmutable: impide modificar, renombrar, eliminar o enlazar el archivo, incluso para `root`.                                            |
+| `chattr +a`                  | Atributo de solo-anexado: permite agregar contenido al final del archivo, pero no modificar ni eliminar lo existente.                           |
+| `chattr +d`                  | Excluye el archivo de las copias de seguridad realizadas con `dump`.                                                                            |
+| `chattr +u`                  | Intenta preservar el contenido de un archivo eliminado para una posible recuperación posterior (soporte limitado).                              |
+| `chattr +j`                  | Fuerza que los cambios se registren primero en el journal antes de escribirse en el archivo (ext3/ext4).                                        |
+| `chattr +S`                  | Fuerza escritura síncrona a disco de cada cambio, priorizando integridad sobre rendimiento.                                                     |
+| `e`, `E`, `I` (solo lectura) | Atributos gestionados automáticamente por el kernel/filesystem (extents, cifrado, indexado htree); visibles con `lsattr` pero no configurables. |
+
 ## Procesos: foreground y background
 
 | Comando / concepto | Descripción                                                                                                                        |
@@ -109,7 +155,3 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | `disown`           | Desvincula un proceso en background de la sesión de shell actual, para que sobreviva aunque se cierre la terminal.                 |
 | Job number         | Identificador de trabajo asignado por el shell dentro de la sesión (se muestra entre corchetes al enviar un proceso a background). |
 | PID                | _Process ID_, identificador único de un proceso a nivel de todo el sistema, asignado por el kernel.                                |
-
----
-
-_Última actualización: comandos básicos, control de flujo y redirecciones en Bash._
