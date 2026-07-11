@@ -195,6 +195,35 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | `/sys`        | Sistema de archivos virtual con la vista jerárquica del kernel, dispositivos y drivers.                                               |
 | `/lost+found` | Directorio generado por `fsck` en filesystems ext, donde se depositan fragmentos recuperados tras una corrupción.                     |
 
+## Búsquedas: find, locate y xargs
+
+| Comando / concepto                        | Descripción                                                                                                                   |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `find <dir> <opciones>`                   | Recorre en tiempo real el árbol de directorios indicado, evaluando cada elemento contra los criterios dados.                  |
+| `-name` / `-iname`                        | Busca por nombre (distinguiendo o ignorando mayúsculas/minúsculas), admite comodines (`*`).                                   |
+| `-type f/d/l`                             | Filtra por tipo: archivo, directorio o enlace simbólico.                                                                      |
+| `-user` / `-group`                        | Filtra por propietario o grupo propietario del archivo.                                                                       |
+| `-perm 4000` / `-perm -4000`              | Permiso exacto vs. "al menos" ese permiso; base para localizar SUID (`4000`), SGID (`2000`) y sticky bit (`1000`).            |
+| `-writable` / `-executable`               | Archivos/directorios sobre los que el usuario actual tiene permiso de escritura/ejecución.                                    |
+| `-size +N[c\|k\|M\|G]`                    | Filtra por tamaño de archivo.                                                                                                 |
+| `-mtime` / `-atime` / `-ctime ±N`         | Filtra por fecha de modificación, acceso o cambio de metadatos, en días (`-mmin`/`-amin`/`-cmin` en minutos).                 |
+| `-newer archivo`                          | Elementos modificados más recientemente que un archivo de referencia.                                                         |
+| `-empty`                                  | Archivos y directorios vacíos.                                                                                                |
+| `-nouser` / `-nogroup`                    | Archivos huérfanos sin usuario o grupo válido asociado.                                                                       |
+| `-maxdepth` / `-mindepth`                 | Limita la profundidad máxima/mínima de recursión.                                                                             |
+| `-delete`                                 | Elimina cada resultado encontrado.                                                                                            |
+| `-exec cmd {} \;` / `-exec cmd {} +`      | Ejecuta un comando sobre cada resultado, uno por uno o agrupados.                                                             |
+| `-print0`                                 | Separa resultados con carácter nulo, para uso seguro con `xargs -0`.                                                          |
+| `2>/dev/null`                             | Descarta errores de "Permiso denegado" al recorrer todo el sistema.                                                           |
+| `locate`                                  | Búsqueda instantánea contra una base de datos indexada (`mlocate.db`), más rápida que `find` pero puede estar desactualizada. |
+| `updatedb`                                | Actualiza manualmente la base de datos usada por `locate`.                                                                    |
+| `locate -r "patrón$"`                     | Búsqueda por expresión regular, útil para anclar el nombre exacto de archivo.                                                 |
+| `locate -i` / `-c` / `-e` / `-q` / `-n N` | Ignora mayúsculas / cuenta resultados / solo existentes / sin errores / limita cantidad.                                      |
+| `xargs`                                   | Convierte la entrada estándar en argumentos de otro comando, agrupándolos para minimizar invocaciones.                        |
+| `xargs -I {}`                             | Marcador de posición para insertar cada línea de entrada en cualquier punto del comando.                                      |
+| `xargs -P N`                              | Ejecuta hasta N procesos en paralelo.                                                                                         |
+| `xargs -0`                                | Interpreta entrada separada por carácter nulo (usar junto a `find -print0`).                                                  |
+
 ## Procesos: foreground y background
 
 | Comando / concepto | Descripción                                                                                                                        |
