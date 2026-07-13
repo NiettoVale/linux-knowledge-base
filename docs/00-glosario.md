@@ -224,6 +224,142 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | `xargs -P N`                              | Ejecuta hasta N procesos en paralelo.                                                                                         |
 | `xargs -0`                                | Interpreta entrada separada por carácter nulo (usar junto a `find -print0`).                                                  |
 
+## SSH
+
+| Comando / concepto                           | Descripción                                                                                                       |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `ssh usuario@host`                           | Conecta a un servidor SSH; con `-p` se indica un puerto distinto al 22 por defecto.                               |
+| `ssh -v`                                     | Salida detallada (verbose), útil para depurar problemas de conexión.                                              |
+| `ssh usuario@host "cmd"`                     | Ejecuta un único comando remoto sin abrir sesión interactiva.                                                     |
+| `ssh-keygen -t ed25519 / rsa -b 4096`        | Genera un par de claves asimétricas (Ed25519 recomendado; RSA por compatibilidad).                                |
+| `ssh-copy-id`                                | Copia la clave pública propia al `authorized_keys` de un servidor remoto.                                         |
+| `~/.ssh/authorized_keys`                     | Archivo del servidor con las claves públicas autorizadas a acceder a esa cuenta.                                  |
+| `~/.ssh/known_hosts`                         | Registro de claves públicas de servidores a los que el cliente ya se conectó.                                     |
+| `ssh-agent` / `ssh-add`                      | Mantiene claves privadas descifradas en memoria durante la sesión, evitando reingresar la passphrase.             |
+| `~/.ssh/config`                              | Define alias y parámetros por defecto (host, usuario, puerto, clave) para conexiones frecuentes.                  |
+| `scp`                                        | Copia archivos entre cliente y servidor de forma directa (`-r` para directorios).                                 |
+| `sftp`                                       | Sesión interactiva de transferencia de archivos sobre SSH (`get`, `put`, `ls`).                                   |
+| `ssh -L puerto_local:destino:puerto_destino` | Reenvío de puerto local: accede desde la máquina local a un servicio solo visible desde el servidor remoto.       |
+| `ssh -R puerto_remoto:destino:puerto_local`  | Reenvío de puerto remoto: expone un servicio local hacia el servidor remoto.                                      |
+| `ssh -D puerto`                              | Reenvío dinámico: convierte la conexión SSH en un proxy SOCKS.                                                    |
+| `ssh -A`                                     | Agent forwarding: reenvía el agente local al servidor remoto (riesgo si el servidor no es de confianza).          |
+| `ssh -J bastion destino` / `ProxyJump`       | Atraviesa un servidor intermedio sin exponer el agente, alternativa más segura a `-A`.                            |
+| `/etc/ssh/sshd_config`                       | Configuración del servidor SSH (`PermitRootLogin`, `PasswordAuthentication`, `AllowUsers`, `MaxAuthTries`, etc.). |
+| `fail2ban`                                   | Herramienta que bloquea IPs con demasiados intentos fallidos de login, mitigando fuerza bruta.                    |
+
+## Manejo avanzado de ficheros
+
+| Comando / concepto          | Descripción                                                                                                                 |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `cat ./-` / `cat $(pwd)/-`  | Formas de leer un archivo cuyo nombre empieza con `-`, evitando que se interprete como flag.                                |
+| `cmd -- archivo`            | Marcador `--`: indica fin de opciones, todo lo posterior se trata como argumento posicional.                                |
+| `cat "nombre con espacios"` | Comillas dobles para tratar un nombre con espacios como un único argumento.                                                 |
+| `cat nombre\ con\ espacios` | Escapado manual de cada espacio con `\`.                                                                                    |
+| `cat s*`                    | Expansión de comodines para evitar escribir un nombre completo con espacios.                                                |
+| `file archivo`              | Identifica el tipo real de un archivo según su contenido (firma/magic number), no según su extensión.                       |
+| `grep -v`                   | Invierte la coincidencia: muestra las líneas que NO matchean el patrón.                                                     |
+| `awk '{print $N}'`          | Imprime el campo N de cada línea; `$NF` referencia siempre al último campo.                                                 |
+| `awk ... FS=":"`            | Define el separador de campos (_Field Separator_) que usará awk.                                                            |
+| `cut -d ':' -f 2`           | Corta cada línea por un delimitador y extrae el campo indicado.                                                             |
+| `tr 'a' 'b'`                | Traduce/sustituye caracteres de un conjunto de origen a un conjunto de destino.                                             |
+| `sort \| uniq -u`           | `uniq` solo detecta duplicados consecutivos, por eso requiere `sort` previo; `-u` muestra líneas sin duplicados.            |
+| `uniq -d` / `uniq -c`       | Muestra solo las líneas duplicadas / antepone el conteo de repeticiones.                                                    |
+| `strings archivo`           | Extrae las cadenas de texto legibles dentro de un archivo binario.                                                          |
+| `xxd archivo`               | Vuelca el contenido de un archivo en hexadecimal, útil para inspeccionar firmas de archivo.                                 |
+| `base64`                    | Codifica datos binarios a texto ASCII imprimible (no es cifrado, es reversible sin clave).                                  |
+| `base64 -d`                 | Decodifica una cadena en Base64 a su forma original.                                                                        |
+| `base64 -w 0`               | Genera la codificación en una única línea, sin salto de línea cada 76 caracteres.                                           |
+| Cifrado César / ROT13       | Desplaza cada letra del alfabeto N posiciones; ROT13 (`tr 'A-Za-z' 'N-ZA-Mn-za-m'`) es el caso con N=13, su propio inverso. |
+
+## SSH
+
+| Comando / concepto                          | Descripción                                                                                                                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ssh usuario@host`                          | Conecta a un servidor SSH; `-p` indica puerto distinto al 22, `-v` activa salida detallada.                                                                          |
+| `ssh usuario@host "cmd"`                    | Ejecuta un único comando remoto sin abrir sesión interactiva.                                                                                                        |
+| Criptografía asimétrica                     | Par de claves matemáticamente relacionadas: lo cifrado/firmado con una solo se verifica/descifra con la otra.                                                        |
+| `ssh-keygen -t ed25519 / rsa -b 4096`       | Genera el par de claves (privada + `.pub`); Ed25519 recomendado sobre RSA.                                                                                           |
+| `id_rsa` / `id_ed25519`                     | Clave **privada**: nunca se comparte, permisos `600`.                                                                                                                |
+| `id_rsa.pub` / `id_ed25519.pub`             | Clave **pública**: se distribuye libremente, se instala en el servidor.                                                                                              |
+| `~/.ssh/authorized_keys`                    | Lista de claves públicas autorizadas a entrar como esa cuenta (permisos `600`, directorio `700`).                                                                    |
+| `~/.ssh/known_hosts`                        | Claves públicas de servidores a los que el cliente ya se conectó.                                                                                                    |
+| `ssh-copy-id -i clave.pub usuario@host`     | Lo ejecuta el **cliente** desde su máquina; instala su clave pública en el `authorized_keys` remoto.                                                                 |
+| Autenticación por firma (desafío-respuesta) | El servidor envía un desafío aleatorio; el cliente lo firma con su clave privada; el servidor verifica la firma con la pública. No es "cifrar/descifrar un mensaje". |
+| Passphrase                                  | Cifra la clave privada en disco local; no viaja al servidor, solo protege el archivo ante robo.                                                                      |
+| `ssh-agent` / `ssh-add`                     | Mantiene claves privadas descifradas en memoria durante la sesión, evitando reingresar la passphrase.                                                                |
+| `~/.ssh/config`                             | Alias y parámetros por defecto (`Host`, `HostName`, `User`, `Port`, `IdentityFile`) para conexiones frecuentes.                                                      |
+| `scp` / `sftp`                              | Copia directa de archivos (`-r` recursivo) / sesión interactiva de transferencia (`get`, `put`, `ls`).                                                               |
+| `ssh -L` / `-R` / `-D`                      | Reenvío de puerto local / remoto / dinámico (proxy SOCKS) — base del pivoting por SSH.                                                                               |
+| `ssh -A`                                    | Agent forwarding: reenvía el agente local al servidor remoto (riesgo si el servidor no es confiable).                                                                |
+| `ssh -J bastion destino` / `ProxyJump`      | Atraviesa un servidor intermedio sin exponer el agente; alternativa más segura a `-A`.                                                                               |
+| `/etc/ssh/sshd_config`                      | Configuración del servidor: `PermitRootLogin`, `PasswordAuthentication`, `AllowUsers`, `MaxAuthTries`, etc.                                                          |
+| `fail2ban`                                  | Bloquea IPs con demasiados intentos fallidos de login, mitigando fuerza bruta.                                                                                       |
+| `ssh usuario@host "bash"`                   | Recupera una shell funcional cuando la sesión de login normal se cierra por un `.bashrc`/`.profile` modificado.                                                      |
+
+## Manejo avanzado de ficheros
+
+| Comando / concepto                 | Descripción                                                                                                            |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `cat ./-` / `cat $(pwd)/-`         | Leer un archivo cuyo nombre empieza con `-`, evitando que se interprete como flag.                                     |
+| `cmd -- archivo`                   | Marcador `--`: fin de opciones, todo lo posterior se trata como argumento posicional.                                  |
+| `cat "nombre con espacios"` / `\ ` | Comillas dobles o escapado manual de espacios en nombres de archivo.                                                   |
+| `file archivo`                     | Identifica el tipo real de un archivo por su firma/magic number, no por su extensión.                                  |
+| `grep -v`                          | Invierte la coincidencia: muestra líneas que NO matchean el patrón.                                                    |
+| `awk '{print $N}'` / `$NF`         | Imprime el campo N; `$NF` referencia siempre al último campo de la línea.                                              |
+| `cut -d ':' -f 2`                  | Corta cada línea por un delimitador y extrae el campo indicado.                                                        |
+| `tr 'a' 'b'`                       | Traduce/sustituye caracteres de un conjunto de origen a uno de destino.                                                |
+| `sort \| uniq -u`                  | `uniq` solo detecta duplicados consecutivos; `-u` muestra líneas sin duplicados, `-d` las duplicadas, `-c` las cuenta. |
+| `strings archivo`                  | Extrae cadenas de texto legibles de un binario.                                                                        |
+| `xxd` / `hexdump -C` / `od`        | Vuelcan el contenido de un archivo en hexadecimal (offset + bytes + ASCII).                                            |
+| Magic number / file signature      | Bytes iniciales característicos de cada formato (`FF D8 FF`=JPEG, `50 4B 03 04`=ZIP, `7F 45 4C 46`=ELF).               |
+| `base64` / `base64 -d`             | Codifica/decodifica a Base64 (no es cifrado, reversible sin clave).                                                    |
+| `base64 -w 0`                      | Codifica en una única línea, sin salto cada 76 caracteres.                                                             |
+| Cifrado César / ROT13              | Desplaza cada letra N posiciones; ROT13 (`tr 'A-Za-z' 'N-ZA-Mn-za-m'`) es el caso N=13, su propio inverso.             |
+
+## sponge, descompresión recursiva y diff
+
+| Comando / concepto                | Descripción                                                                                                                                                      |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sponge` (moreutils)              | Absorbe toda la entrada en memoria antes de escribir; permite leer y sobrescribir el mismo archivo en un pipeline sin vaciarlo (`cat f \| awk ... \| sponge f`). |
+| Condición de carrera en `>`/`tee` | `cmd f > f` o `cmd f \| tee f` vacían el archivo antes/durante la lectura, por eso truncan el contenido.                                                         |
+| `7z l` / `7z x`                   | Lista (`l`) o extrae (`x`) el contenido de un archivo comprimido con 7-Zip.                                                                                      |
+| `while [ $var ]; do ...; done`    | Bucle que se repite mientras la variable no esté vacía; base de la descompresión recursiva automática.                                                           |
+| `trap ctrl_c INT`                 | Captura la señal `Ctrl+C` (`INT`) para finalizar un script de forma controlada.                                                                                  |
+| `diff archivo1 archivo2`          | Compara dos archivos línea por línea, mostrando qué difiere entre ambos.                                                                                         |
+| `diff -u`                         | Formato unificado, el más legible (el mismo que usa Git).                                                                                                        |
+| `diff -r dir1/ dir2/`             | Compara recursivamente el contenido de dos directorios.                                                                                                          |
+
+## Netcat
+
+| Comando / concepto                                       | Descripción                                                                                                                       |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `nc -lvnp <puerto>`                                      | Modo servidor/escucha: `l` listen, `v` verbose, `n` sin resolución DNS, `p` puerto.                                               |
+| `nc host puerto`                                         | Modo cliente: inicia conexión hacia un host y puerto remotos.                                                                     |
+| `nc -zv host rango`                                      | Escaneo básico de puertos TCP (`-z` no envía datos, solo comprueba conexión).                                                     |
+| `nc -lvnp puerto > archivo` / `nc host puerto < archivo` | Transferencia de archivos entre dos máquinas sin servidor dedicado.                                                               |
+| Banner grabbing                                          | Conectarse a un puerto para leer el mensaje de bienvenida y detectar software/versión.                                            |
+| Bind shell                                               | La víctima escucha y vincula un puerto a una shell (`nc -lvnp puerto -e /bin/bash`); requiere alcanzar directamente a la víctima. |
+| Reverse shell                                            | El atacante escucha; la víctima inicia la conexión saliente y entrega la shell; sortea mejor los firewalls.                       |
+| `nc -k`                                                  | Mantiene el servidor escuchando tras desconectarse un cliente (keep listening).                                                   |
+| `nc -w N`                                                | Cierra la conexión tras N segundos de inactividad.                                                                                |
+| `nc -4` / `-6`                                           | Fuerza el uso de IPv4 o IPv6.                                                                                                     |
+| `nc -u`                                                  | Usa UDP en lugar de TCP.                                                                                                          |
+| `nc -q N`                                                | Espera N segundos tras un EOF antes de cerrar la conexión.                                                                        |
+
+## Puertos, procesos de red y explotación de SUID
+
+| Comando / concepto               | Descripción                                                                                                                          |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `ss -nltp`                       | Lista sockets en escucha (`l`), TCP (`t`), sin resolver DNS (`n`), con el proceso propietario (`p`); sustituto moderno de `netstat`. |
+| `netstat -s`                     | Estadísticas de red por protocolo.                                                                                                   |
+| `/proc/net/tcp`                  | Tabla virtual del kernel con las conexiones TCP activas; puertos en formato `IP_hex:PUERTO_hex`.                                     |
+| `bc` con `ibase`/`obase`         | Calculadora de línea de comandos; permite convertir entre bases numéricas (ej. hex → decimal).                                       |
+| `lsof -i:<puerto>`               | Identifica qué proceso (PID, usuario, comando) tiene abierto un puerto determinado.                                                  |
+| `lsof -i -sTCP:LISTEN`           | Lista todos los sockets del sistema en estado de escucha.                                                                            |
+| GTFOBins                         | Catálogo de binarios abusables bajo SUID/sudo/capabilities para escalar privilegios.                                                 |
+| `find / -perm -4000 -type f`     | Localiza binarios con SUID activado (repaso: base de la enumeración de privesc).                                                     |
+| `find ... -exec /bin/bash -p \;` | Ejemplo de abuso de un binario SUID para obtener shell con privilegios heredados (`-p` conserva el UID efectivo).                    |
+
 ## Procesos: foreground y background
 
 | Comando / concepto | Descripción                                                                                                                        |
@@ -232,3 +368,5 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | `disown`           | Desvincula un proceso en background de la sesión de shell actual, para que sobreviva aunque se cierre la terminal.                 |
 | Job number         | Identificador de trabajo asignado por el shell dentro de la sesión (se muestra entre corchetes al enviar un proceso a background). |
 | PID                | _Process ID_, identificador único de un proceso a nivel de todo el sistema, asignado por el kernel.                                |
+
+---
