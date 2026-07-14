@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "m:uy:i:d:h" arg; do
+while getopts "m:uy:i:d:o:h" arg; do
     case $arg in
         m) 
             machineName="$OPTARG"
@@ -20,6 +20,10 @@ while getopts "m:uy:i:d:h" arg; do
            difficulty="$OPTARG"
            ((parameter_counter += 5))
            ;;
+        o)
+            system="$OPTARG"
+            ((parameter_counter += 6))
+            ;;
         h) 
             helpPanel
             exit 0
