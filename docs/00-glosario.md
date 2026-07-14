@@ -226,53 +226,6 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 
 ## SSH
 
-| Comando / concepto                           | Descripción                                                                                                       |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `ssh usuario@host`                           | Conecta a un servidor SSH; con `-p` se indica un puerto distinto al 22 por defecto.                               |
-| `ssh -v`                                     | Salida detallada (verbose), útil para depurar problemas de conexión.                                              |
-| `ssh usuario@host "cmd"`                     | Ejecuta un único comando remoto sin abrir sesión interactiva.                                                     |
-| `ssh-keygen -t ed25519 / rsa -b 4096`        | Genera un par de claves asimétricas (Ed25519 recomendado; RSA por compatibilidad).                                |
-| `ssh-copy-id`                                | Copia la clave pública propia al `authorized_keys` de un servidor remoto.                                         |
-| `~/.ssh/authorized_keys`                     | Archivo del servidor con las claves públicas autorizadas a acceder a esa cuenta.                                  |
-| `~/.ssh/known_hosts`                         | Registro de claves públicas de servidores a los que el cliente ya se conectó.                                     |
-| `ssh-agent` / `ssh-add`                      | Mantiene claves privadas descifradas en memoria durante la sesión, evitando reingresar la passphrase.             |
-| `~/.ssh/config`                              | Define alias y parámetros por defecto (host, usuario, puerto, clave) para conexiones frecuentes.                  |
-| `scp`                                        | Copia archivos entre cliente y servidor de forma directa (`-r` para directorios).                                 |
-| `sftp`                                       | Sesión interactiva de transferencia de archivos sobre SSH (`get`, `put`, `ls`).                                   |
-| `ssh -L puerto_local:destino:puerto_destino` | Reenvío de puerto local: accede desde la máquina local a un servicio solo visible desde el servidor remoto.       |
-| `ssh -R puerto_remoto:destino:puerto_local`  | Reenvío de puerto remoto: expone un servicio local hacia el servidor remoto.                                      |
-| `ssh -D puerto`                              | Reenvío dinámico: convierte la conexión SSH en un proxy SOCKS.                                                    |
-| `ssh -A`                                     | Agent forwarding: reenvía el agente local al servidor remoto (riesgo si el servidor no es de confianza).          |
-| `ssh -J bastion destino` / `ProxyJump`       | Atraviesa un servidor intermedio sin exponer el agente, alternativa más segura a `-A`.                            |
-| `/etc/ssh/sshd_config`                       | Configuración del servidor SSH (`PermitRootLogin`, `PasswordAuthentication`, `AllowUsers`, `MaxAuthTries`, etc.). |
-| `fail2ban`                                   | Herramienta que bloquea IPs con demasiados intentos fallidos de login, mitigando fuerza bruta.                    |
-
-## Manejo avanzado de ficheros
-
-| Comando / concepto          | Descripción                                                                                                                 |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `cat ./-` / `cat $(pwd)/-`  | Formas de leer un archivo cuyo nombre empieza con `-`, evitando que se interprete como flag.                                |
-| `cmd -- archivo`            | Marcador `--`: indica fin de opciones, todo lo posterior se trata como argumento posicional.                                |
-| `cat "nombre con espacios"` | Comillas dobles para tratar un nombre con espacios como un único argumento.                                                 |
-| `cat nombre\ con\ espacios` | Escapado manual de cada espacio con `\`.                                                                                    |
-| `cat s*`                    | Expansión de comodines para evitar escribir un nombre completo con espacios.                                                |
-| `file archivo`              | Identifica el tipo real de un archivo según su contenido (firma/magic number), no según su extensión.                       |
-| `grep -v`                   | Invierte la coincidencia: muestra las líneas que NO matchean el patrón.                                                     |
-| `awk '{print $N}'`          | Imprime el campo N de cada línea; `$NF` referencia siempre al último campo.                                                 |
-| `awk ... FS=":"`            | Define el separador de campos (_Field Separator_) que usará awk.                                                            |
-| `cut -d ':' -f 2`           | Corta cada línea por un delimitador y extrae el campo indicado.                                                             |
-| `tr 'a' 'b'`                | Traduce/sustituye caracteres de un conjunto de origen a un conjunto de destino.                                             |
-| `sort \| uniq -u`           | `uniq` solo detecta duplicados consecutivos, por eso requiere `sort` previo; `-u` muestra líneas sin duplicados.            |
-| `uniq -d` / `uniq -c`       | Muestra solo las líneas duplicadas / antepone el conteo de repeticiones.                                                    |
-| `strings archivo`           | Extrae las cadenas de texto legibles dentro de un archivo binario.                                                          |
-| `xxd archivo`               | Vuelca el contenido de un archivo en hexadecimal, útil para inspeccionar firmas de archivo.                                 |
-| `base64`                    | Codifica datos binarios a texto ASCII imprimible (no es cifrado, es reversible sin clave).                                  |
-| `base64 -d`                 | Decodifica una cadena en Base64 a su forma original.                                                                        |
-| `base64 -w 0`               | Genera la codificación en una única línea, sin salto de línea cada 76 caracteres.                                           |
-| Cifrado César / ROT13       | Desplaza cada letra del alfabeto N posiciones; ROT13 (`tr 'A-Za-z' 'N-ZA-Mn-za-m'`) es el caso con N=13, su propio inverso. |
-
-## SSH
-
 | Comando / concepto                          | Descripción                                                                                                                                                          |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ssh usuario@host`                          | Conecta a un servidor SSH; `-p` indica puerto distinto al 22, `-v` activa salida detallada.                                                                          |
@@ -359,6 +312,62 @@ Este glosario reúne, organizados por categoría, todos los comandos, operadores
 | GTFOBins                         | Catálogo de binarios abusables bajo SUID/sudo/capabilities para escalar privilegios.                                                 |
 | `find / -perm -4000 -type f`     | Localiza binarios con SUID activado (repaso: base de la enumeración de privesc).                                                     |
 | `find ... -exec /bin/bash -p \;` | Ejemplo de abuso de un binario SUID para obtener shell con privilegios heredados (`-p` conserva el UID efectivo).                    |
+
+## Cron
+
+| Comando / concepto                            | Descripción                                                                                                                                    |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Minuto Hora Día-mes Mes Día-semana Comando`  | Formato de 5 campos de cron; día-semana admite `0` y `7` para domingo.                                                                         |
+| `*`                                           | Cualquier valor válido para ese campo.                                                                                                         |
+| `,`                                           | Lista de valores concretos (ej. `8,12,18`).                                                                                                    |
+| `-`                                           | Rango continuo de valores (ej. `9-17`).                                                                                                        |
+| `/`                                           | Paso/incremento dentro de un rango o del rango completo (ej. `*/5` = cada 5 minutos).                                                          |
+| `@reboot`                                     | Ejecuta la tarea una vez, al arrancar el sistema.                                                                                              |
+| `@daily` / `@weekly` / `@monthly` / `@yearly` | Atajos equivalentes a `0 0 * * *`, `0 0 * * 0`, `0 0 1 * *`, `0 0 1 1 *`.                                                                      |
+| `crontab -e` / `-l` / `-r`                    | Edita / lista / elimina las tareas cron del usuario actual.                                                                                    |
+| `crontab -u usuario -l`                       | Consulta el crontab de otro usuario (requiere privilegios).                                                                                    |
+| `/etc/crontab`                                | Crontab del sistema; incluye un campo adicional de usuario antes del comando.                                                                  |
+| `/etc/cron.d/`                                | Archivos de tareas cron añadidos por paquetes instalados (mismo formato que `/etc/crontab`).                                                   |
+| `/etc/cron.{hourly,daily,weekly,monthly}/`    | Contienen scripts ejecutables (no líneas cron), corridos por `run-parts` según la periodicidad del nombre.                                     |
+| `/etc/cron.allow` / `/etc/cron.deny`          | Controlan qué usuarios pueden usar `crontab`.                                                                                                  |
+| `md5sum`                                      | Genera un hash MD5 de un archivo para detectar si su contenido cambió.                                                                         |
+| `mktemp -d`                                   | Crea un directorio temporal con nombre único, útil para pruebas aisladas.                                                                      |
+| Cron como vector de privesc                   | Tarea de `root` + permiso de escritura sobre el script o su directorio contenedor = posibilidad de reemplazar el script y escalar privilegios. |
+
+## Fuerza bruta de conexiones con Netcat
+
+| Comando / concepto                   | Descripción                                                                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `{0000..9999}`                       | Brace expansion de bash: genera secuencias numéricas con relleno de ceros automático.                                           |
+| `echo "dato" \| nc host puerto`      | Envía datos a través de una conexión; sin `echo`, bash interpreta el texto entre comillas como nombre de comando, no como dato. |
+| `nc -q N`                            | Cierra la conexión N segundos después de un EOF, evitando que cada intento del bucle quede colgado.                             |
+| `grep -vE "patrón1\|patrón2"`        | La alternancia `\|` en regex requiere `-E` (extendida); con `grep` básico se trata como carácter literal.                       |
+| `grep -q`                            | Modo silencioso: no imprime nada, solo devuelve un código de éxito/fallo, útil dentro de un `if`.                               |
+| `xargs -P N` aplicado a fuerza bruta | Paraleliza los intentos de conexión para acelerar un ataque de fuerza bruta.                                                    |
+
+## Escape de shells restringidas (more/vim)
+
+| Comando / concepto            | Descripción                                                                                                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ForceCommand`                | Directiva de `sshd_config` (o `authorized_keys`) que obliga a ejecutar un comando concreto en vez de abrir una shell normal.                           |
+| `v` (dentro de `more`/`less`) | Abre el archivo actual en el editor definido por `$EDITOR`/`$VISUAL`, o `vi` por defecto.                                                              |
+| `:set shell=/bin/bash`        | Dentro de vim, define qué intérprete usar al invocar una shell externa.                                                                                |
+| `:shell`                      | Abre una shell interactiva persistente desde dentro de vim.                                                                                            |
+| `:!comando`                   | Ejecuta un único comando puntual sin salir de vim, devolviendo el control al editor al terminar.                                                       |
+| Principio de escape           | Un programa invocado desde dentro de uno restringido no hereda automáticamente esa restricción; mismo mecanismo detrás de muchas entradas de GTFOBins. |
+
+## Argumentos posicionales en Bash
+
+| Comando / concepto                    | Descripción                                                                                                                   |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `$0`                                  | Nombre/ruta con la que se invocó el propio script.                                                                            |
+| `$1`, `$2`...                         | Argumentos individuales, numerados según su posición.                                                                         |
+| `${10}`                               | Sintaxis con llaves obligatoria para argumentos de dos o más dígitos (`$10` sin llaves es `$1` + `"0"`).                      |
+| `$#`                                  | Cantidad total de argumentos recibidos (sin contar `$0`).                                                                     |
+| `$*` sin comillas / `$@` sin comillas | Equivalentes: se dividen en palabras por espacios.                                                                            |
+| `"$*"`                                | Combina todos los argumentos en una sola cadena, separada por el primer carácter de `$IFS`.                                   |
+| `"$@"`                                | Preserva cada argumento como entidad independiente, respetando espacios internos; forma recomendada para reenviar argumentos. |
+| `shift`                               | Desplaza los argumentos posicionales una posición a la izquierda y reduce `$#` en uno.                                        |
 
 ## Procesos: foreground y background
 
