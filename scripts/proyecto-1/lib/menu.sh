@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "m:uy:i:d:o:do:s:h" arg; do
+while getopts "m:uy:i:d:o:s:h" arg; do
     case $arg in
         m) 
             machineName="$OPTARG"

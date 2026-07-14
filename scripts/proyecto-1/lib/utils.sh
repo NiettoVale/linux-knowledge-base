@@ -157,7 +157,6 @@ function listMachinesOsAndDifficulty(){
 function listMachinesSkills(){
     skill="$1"
     machines=$(cat "$PROJECT_DIR/data/bundle.js" | \
-        grep "so: \"Linux\"" -B 5 -A 5 | \
         grep -vE "id:|sku:" | \
         grep "skills: .*$skill" -B 4 -A 4 --no-group-separator | \
         grep "name: " | \
