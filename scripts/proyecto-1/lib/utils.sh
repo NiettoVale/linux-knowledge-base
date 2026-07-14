@@ -67,7 +67,7 @@ function youtubeLink(){
     fi
 }
 
-function listMachines(){
+function listMachinesDifficulty(){
     difficulty="$1"
     machines=$(cat "$PROJECT_DIR/data/bundle.js" | \
         grep -i "dificultad: \"$difficulty\"" -B 5 | \
@@ -91,6 +91,31 @@ function listMachines(){
     else
         print_alerta "\n[✗] No se encontraron máquinas con la dificultad: '$difficulty'"
         print_texto "    (Dificultades válidas: Fácil, Media, Difícil, Insane)"
+    fi
+}
+
+function listMachinesOS(){
+    system="$1"
+    machines=$(cat "$PROJECT_DIR/data/bundle.js" | \
+         grep "so: \"$system\"" -B 5 | \
+         grep name | awk 'NF{print $NF}' | \
+         tr -d '"' | tr -d ',' | \
+         sort | xargs
+    )
+
+    if [[ -n "$machines" ]]; then
+        count=$(echo "$machines" | wc -w)
+
+        print_brillo "⚡ Listando máquinas para el sistema operativo: ${_acento}$system ${_texto}($count máquinas encontradas)"
+        
+        print_linea
+       
+        echo "$machines" | tr ' ' '\n' | column -c "$(tput cols)"
+        
+        print_linea
+    else
+        print_alerta "\n[✗] No se encontraron máquinas para el sistema operativo: '$system'"
+        print_texto "    (Sistemas Operativos válidos: Linux, Windows)"
     fi
 }
 
