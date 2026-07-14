@@ -1,0 +1,26 @@
+#!/bin/bash
+
+BIN_DIR="$(dirname "$(readlink -f "$0")")"
+PROJECT_DIR="$(dirname "$BIN_DIR")"
+source "$PROJECT_DIR/lib/colors.sh"
+source "$PROJECT_DIR/lib/utils.sh"
+
+trap ctrl_c INT
+
+# Variables globales
+main_url='https://htbmachines.github.io/bundle.js'
+
+declare -i parameter_counter=0
+machineName=""
+
+source "$PROJECT_DIR/lib/menu.sh"
+
+presentation
+
+if [[ $parameter_counter -eq 1 ]]; then
+    searchMachine "$machineName"
+elif [[ $parameter_counter -eq 2 ]]; then
+	updateFile
+else
+    helpPanel
+fi
