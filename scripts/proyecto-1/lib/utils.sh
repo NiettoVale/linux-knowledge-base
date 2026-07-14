@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 source "$PROJECT_DIR/lib/colors.sh"
 
@@ -20,7 +20,14 @@ function helpPanel(){
 
 function searchMachine(){
     machine=$(print_texto "$1")
-    print_brillo "⚡ Buscando la máquina: $machine"
+    print_brillo "⚡ Buscando la máquina: $machine\n"
+
+    cat ./scripts/proyecto-1/data/bundle.js | \
+        awk "/name: \"$1\"/,/resuelta:/" | \
+        grep -vE "id:|sku:" | \
+        tr -d "," | \
+        sed "s/^ *//" | \
+        sed "s/^\([^:]*\):/\x1b[38;2;112;0;255m\1\x1b[0m:/"
 }
 
 function updateFile(){
