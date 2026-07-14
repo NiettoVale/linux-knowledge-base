@@ -119,6 +119,41 @@ function listMachinesOS(){
     fi
 }
 
+function listMachinesOsAndDifficulty(){
+    system=$1
+    difficulty=$2
+
+    machines=$(cat "$PROJECT_DIR/data/bundle.js" | \
+        grep "so: \"$system\"" -B 5 -A 5 | \
+        grep "dificultad: \"$difficulty\"" -B 5 -A 4 | \
+        grep -vE "id:|sku:" | \
+        grep "name: " | \
+        awk 'NF{print $NF}'| \
+        tr -d '"' | tr -d ',' | \
+        sort)
+
+    if [[ -n "$machines" ]]; then
+        count=$(echo "$machines" | wc -w)
+
+        # Usamos el rosa neón (_brillo) para la acción principal y violeta (_acento) para destacar las variables
+        print_brillo "⚡ Listando máquinas para ${_acento}$system${_brillo} con dificultad ${_acento}$difficulty ${_texto}($count encontradas)"
+        
+        print_linea
+        
+        echo "$machines" | tr ' ' '\n' | column -c "$(tput cols)"
+        
+        print_linea
+    else
+        # El bloque de error en rojo carmesí (_alerta) con los parámetros destacados
+        print_alerta "\n[✗] No se encontraron máquinas para S.O. '${_texto}$system${_alerta}' y dificultad '${_texto}$difficulty${_alerta}'"
+        
+        # Alineamos los consejos abajo con sangría limpia usando el gris por defecto (_texto)
+        print_texto "\n    💡 Valores sugeridos:"
+        print_texto "       • S.O.         : Linux, Windows"
+        print_texto "       • Dificultad   : Fácil, Media, Difícil, Insane\n"
+    fi
+}
+
 function updateFile(){
     tput civis
     print_acento "\n[+] Sincronizando base de datos (bundle.js)..."
