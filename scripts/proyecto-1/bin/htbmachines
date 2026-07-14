@@ -15,6 +15,7 @@ main_url='https://htbmachines.github.io/bundle.js'
 declare -i parameter_counter=0
 machineName=""
 ipAddress=""
+difficulty=""
 
 source "$PROJECT_DIR/lib/menu.sh"
 
@@ -28,6 +29,8 @@ elif [[ $parameter_counter -eq 3 ]];then
     searchIP $ipAddress
 elif [[ $parameter_counter -eq 4 ]];then
     youtubeLink "$machineName"
+elif [[ $parameter_counter -eq 5 ]];then
+    listMachines "$difficulty"
 else
     helpPanel
 fi
