@@ -154,6 +154,32 @@ function listMachinesOsAndDifficulty(){
     fi
 }
 
+function listMachinesSkills(){
+    skill="$1"
+    machines=$(cat "$PROJECT_DIR/data/bundle.js" | \
+        grep "so: \"Linux\"" -B 5 -A 5 | \
+        grep -vE "id:|sku:" | \
+        grep "skills: .*$skill" -B 4 -A 4 --no-group-separator | \
+        grep "name: " | \
+        awk 'NF{print $NF}' | \
+        tr -d '"' | tr -d ','
+    )
+
+    if [[ -n "$machines" ]]; then
+        count=$(echo "$machines" | wc -w)
+
+        print_brillo "⚡ Listando máquinas para la skill: ${_acento}$skill ${_texto}($count máquinas encontradas)"
+        
+        print_linea
+       
+        echo "$machines" | tr ' ' '\n' | column -c "$(tput cols)"
+        
+        print_linea
+    else
+        print_alerta "\n[✗] No se encontraron máquinas para la skill: '$skill'"
+    fi
+}
+
 function updateFile(){
     tput civis
     print_acento "\n[+] Sincronizando base de datos (bundle.js)..."
