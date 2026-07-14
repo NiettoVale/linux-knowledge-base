@@ -14,6 +14,7 @@ function presentation(){
 function helpPanel(){
     print_acento "\n[+] Uso:"
     print_texto "    -u                  : Descargar o actualizar ficheros necesarios"
+    print_texto "    -i                  : Buscar una maquina por su IP"
     print_texto "    -m <nombre_maquina> : Buscar una máquina por su nombre"
     print_texto "    -h                  : Mostrar este panel de ayuda"
 }
@@ -73,5 +74,24 @@ function existFile(){
         return 0
     else
         return 1
+    fi
+}
+
+function searchIP(){
+    print_brillo "⚡ Buscando máquina asociada a la IP: ${_texto}$ipAddress\n"
+
+    ipAddress="$1"
+    machineName=$(
+    cat "$PROJECT_DIR/data/bundle.js" | \
+        grep "ip: \"$ipAddress\"" -B 3 | \
+        grep "name: " | \
+        awk 'NF{print $NF}' | \
+        tr -d '"' | tr -d ','
+    )
+
+    if [[ -n "$machineName" ]]; then
+        print_texto "[✓] La máquina asociada es: ${_acento}$machineName"
+    else
+        print_alerta "[✗] No se encontró ninguna máquina con la IP: $ipAddress"
     fi
 }

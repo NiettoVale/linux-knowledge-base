@@ -1,17 +1,20 @@
 #!/bin/bash
 
-while getopts "m:uh" arg; do
+while getopts "m:ui:h" arg; do
     case $arg in
         m) 
             machineName="$OPTARG"
             ((parameter_counter++)) 
             ;;
+        u)
+            ((parameter_counter+=2))
+            ;;
+        i) ipAddress="$OPTARG"
+           ((parameter_counter += 3)) 
+           ;;
         h) 
             helpPanel
             exit 0
-            ;;
-        u)
-            ((parameter_counter+=2))
             ;;
         *)
             helpPanel

@@ -12,6 +12,7 @@ main_url='https://htbmachines.github.io/bundle.js'
 
 declare -i parameter_counter=0
 machineName=""
+ipAddress=""
 
 source "$PROJECT_DIR/lib/menu.sh"
 
@@ -21,6 +22,8 @@ if [[ $parameter_counter -eq 1 ]]; then
     searchMachine "$machineName"
 elif [[ $parameter_counter -eq 2 ]]; then
 	updateFile
+elif [[ $parameter_counter -eq 3 ]];then
+    searchIP $ipAddress
 else
     helpPanel
 fi
