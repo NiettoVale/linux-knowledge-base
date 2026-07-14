@@ -2,8 +2,10 @@
 
 BIN_DIR="$(dirname "$(readlink -f "$0")")"
 PROJECT_DIR="$(dirname "$BIN_DIR")"
+
 source "$PROJECT_DIR/lib/colors.sh"
 source "$PROJECT_DIR/lib/utils.sh"
+source "$PROJECT_DIR/lib/ui.sh"
 
 trap ctrl_c INT
 
@@ -24,6 +26,8 @@ elif [[ $parameter_counter -eq 2 ]]; then
 	updateFile
 elif [[ $parameter_counter -eq 3 ]];then
     searchIP $ipAddress
+elif [[ $parameter_counter -eq 4 ]];then
+    youtubeLink "$machineName"
 else
     helpPanel
 fi
