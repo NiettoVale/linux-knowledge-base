@@ -1,39 +1,75 @@
 #!/bin/bash
 
 source "$PROJECT_DIR/lib/colors.sh"
+source "$PROJECT_DIR/lib/validators.sh"
 
 function ctrl_c(){
     print_alerta "\n\n[!] Saliendo del programa...\n"
     tput cnorm && exit 1
 }
 
-function presentation(){
-    print_titulo "=== HTB MACHINES ==="
-}
-
-function helpPanel(){
-    print_acento "\n[+] Uso:"
-    print_texto "    -u                  : Descargar o actualizar ficheros necesarios"
-    print_texto "    -i                  : Buscar una maquina por su IP"
-    print_texto "    -m <nombre_maquina> : Buscar una máquina por su nombre"
-    print_texto "    -h                  : Mostrar este panel de ayuda"
-}
-
 function searchMachine(){
-    machine=$(print_texto "$1")
-    print_brillo "⚡ Buscando la máquina: $machine\n"
+    machine_name="$1"
+    machine_colored=$(print_texto "$machine_name")
 
-    cat ./scripts/proyecto-1/data/bundle.js | \
-        awk "/name: \"$1\"/,/resuelta:/" | \
-        grep -vE "id:|sku:" | \
-        tr -d "," | \
-        sed "s/^ *//" | \
-        sed "s/^\([^:]*\):/\x1b[38;2;112;0;255m\1\x1b[0m:/"
+    if check_machine_exists "$machine_name"; then
+        print_brillo "⚡ Buscando la máquina: $machine_colored\n"
+
+        cat "$PROJECT_DIR/data/bundle.js" | \
+            awk "/name: \"$machine_name\"/,/resuelta:/" | \
+            grep -vE "id:|sku:" | \
+            tr -d "," | \
+            sed "s/^ *//" | \
+            sed "s/^\([^:]*\):/\x1b[38;2;112;0;255m\1\x1b[0m:/"
+    else
+        print_alerta "\n[✗] La máquina '$machine_name' no existe en el sistema."
+    fi
+}
+
+function searchIP(){
+    ipAddress="$1"
+    
+    if check_ip_exists "$ipAddress"; then
+        print_brillo "⚡ Buscando máquina asociada a la IP: ${_texto}$ipAddress\n"
+        machineName=$(
+            cat "$PROJECT_DIR/data/bundle.js" | \
+                grep "ip: \"$ipAddress\"" -B 3 | \
+                grep "name: " | \
+                awk 'NF{print $NF}' | \
+                tr -d '"' | tr -d ','
+        )
+
+        print_texto "[✓] La máquina asociada es: ${_acento}$machineName"
+    else
+        print_alerta "\n[✗] No se encontró ninguna máquina con la IP: $ipAddress"
+    fi
+}
+
+function youtubeLink(){
+    machine_name="$1"
+
+    if check_machine_exists "$machine_name"; then
+        link=$(
+            cat "$PROJECT_DIR/data/bundle.js" | \
+                awk "/name: \"$machine_name\"/,/resuelta:/" | \
+                grep "youtube:" | \
+                awk 'NF{print $NF}' | \
+                tr -d '"' | tr -d ','
+        )
+
+        if [[ -n "$link" ]]; then
+            print_texto "${_acento}[✓] Link:${_texto} $link"
+        else
+            print_alerta "[✗] No se encontró ningún canal de YouTube para esta máquina."
+        fi
+    else
+        print_alerta "\n[✗] La máquina '$machine_name' no existe en el sistema."
+    fi
 }
 
 function updateFile(){
     tput civis
-    print_acento "\n[+] Sincronizando base de datos local (bundle.js)..."
+    print_acento "\n[+] Sincronizando base de datos (bundle.js)..."
     sleep 2
     
     if ! existFile; then
@@ -55,7 +91,6 @@ function updateFile(){
         
         if [[ "$original_hash" == "$temp_hash" ]]; then
             print_texto "\n[✓] Tu base de datos ya está en la versión más reciente. No hay cambios."
-            
             rm "$PROJECT_DIR/data/bundle_temp.js"
         else
             print_brillo "\n[!] ¡Nueva actualización detectada en el servidor!"
@@ -67,31 +102,4 @@ function updateFile(){
         fi
     fi
     tput cnorm
-}
-
-function existFile(){
-    if [[ -f "$PROJECT_DIR/data/bundle.js" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-function searchIP(){
-    print_brillo "⚡ Buscando máquina asociada a la IP: ${_texto}$ipAddress\n"
-
-    ipAddress="$1"
-    machineName=$(
-    cat "$PROJECT_DIR/data/bundle.js" | \
-        grep "ip: \"$ipAddress\"" -B 3 | \
-        grep "name: " | \
-        awk 'NF{print $NF}' | \
-        tr -d '"' | tr -d ','
-    )
-
-    if [[ -n "$machineName" ]]; then
-        print_texto "[✓] La máquina asociada es: ${_acento}$machineName"
-    else
-        print_alerta "[✗] No se encontró ninguna máquina con la IP: $ipAddress"
-    fi
 }
