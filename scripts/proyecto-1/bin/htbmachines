@@ -17,6 +17,7 @@ machineName=""
 ipAddress=""
 difficulty=""
 system=""
+skill=""
 
 source "$PROJECT_DIR/lib/menu.sh"
 
@@ -34,6 +35,8 @@ elif [[ $parameter_counter -eq 5 ]];then
     listMachinesDifficulty "$difficulty"
 elif [[ $parameter_counter -eq 6 ]];then
     listMachinesOS "$system"
+elif [[ $parameter_counter -eq 7 ]];then
+    listMachinesSkills "$skill"
 elif [[ $parameter_counter -eq 11 ]]; then
     listMachinesOsAndDifficulty "$system" "$difficulty"
 else

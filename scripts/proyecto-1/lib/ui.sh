@@ -12,7 +12,7 @@ function helpPanel(){
     print_texto "    -m <nombre_maquina> : Buscar una máquina por su nombre"
     print_texto "    -d <dificultad>     : Filtra las máquinas por una dificultad"
     print_texto "    -o <so>             : Filtra las máquinas por un sistema operativo"
-    print_texto "    -do <dificultad-so> : Filtra las máquinas por un sistema operativo y una dificultad"
+    print_texto "    -s <skill>          : Filtra las máquinas por una skill"
     print_texto "    -h                  : Mostrar este panel de ayuda"
 }
 
