@@ -34,6 +34,8 @@ elif [[ $parameter_counter -eq 5 ]];then
     listMachinesDifficulty "$difficulty"
 elif [[ $parameter_counter -eq 6 ]];then
     listMachinesOS "$system"
+elif [[ $parameter_counter -eq 11 ]]; then
+    listMachinesOsAndDifficulty "$system" "$difficulty"
 else
     helpPanel
 fi
