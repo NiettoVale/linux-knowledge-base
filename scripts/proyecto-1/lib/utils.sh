@@ -67,6 +67,33 @@ function youtubeLink(){
     fi
 }
 
+function listMachines(){
+    difficulty="$1"
+    machines=$(cat "$PROJECT_DIR/data/bundle.js" | \
+        grep -i "dificultad: \"$difficulty\"" -B 5 | \
+        grep "name:" | \
+        awk 'NF{print $NF}' | \
+        tr -d '"' | tr -d ',' | \
+        sort | \
+        xargs
+    )
+
+    if [[ -n "$machines" ]]; then
+        count=$(echo "$machines" | wc -w)
+
+        print_brillo "⚡ Listando máquinas con dificultad: ${_acento}$difficulty ${_texto}($count máquinas encontradas)"
+        
+        print_linea
+       
+        echo "$machines" | tr ' ' '\n' | column -c "$(tput cols)"
+        
+        print_linea
+    else
+        print_alerta "\n[✗] No se encontraron máquinas con la dificultad: '$difficulty'"
+        print_texto "    (Dificultades válidas: Fácil, Media, Difícil, Insane)"
+    fi
+}
+
 function updateFile(){
     tput civis
     print_acento "\n[+] Sincronizando base de datos (bundle.js)..."
