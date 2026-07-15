@@ -12,8 +12,10 @@ while getopts "m:t:h" arg; do
     esac
 done
 
-if [[ $money -eq 0 ]] || [[ -z "$technique" ]];then
+if [[ -z "$money" ]] || [[ -z "$technique" ]];then
     print_alerta "[✗] Error: Faltan parámetros obligatorios.\n"
     helpPanel
     exit 1
 fi
+
+isValidMoney $money # Verificamos que sea un monto valido
