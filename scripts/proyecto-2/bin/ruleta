@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Variables Globales
+BIN_DIR="$(dirname "$(readlink -f $0)")"
+PROJECT_DIR="$(dirname "$BIN_DIR")"
+
+# Importaciones de los modulos
+source "$PROJECT_DIR/lib/ui.sh"
+source "$PROJECT_DIR/lib/colors.sh"
+source "$PROJECT_DIR/lib/menu.sh"
+source "$PROJECT_DIR/lib/utils.sh"
+source "$PROJECT_DIR/lib/validators.sh"
+
+trap ctrl_c INT # Cotrol del flujo cuando aprietan ctrl + c para interrumpir el programa
