@@ -5,3 +5,7 @@ function ctrl_c(){
     tput cnorm && exit 1
 }
 
+
+function randomNumber(){
+    echo "$(($RANDOM % 37))"
+}
